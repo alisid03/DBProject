@@ -12,11 +12,16 @@ public class HorizontalPartitioningManager {
     
     private static final String PD = "PARTITIONED_DATA_";
 
+    String password;
+    public HorizontalPartitioningManager(String _password) {
+        password = _password;
+    }
+
     public List<Data> retrieveAll(String db_name){
 
         DBConnection dbConnection = new DBConnection();
 
-        try(Connection conn = dbConnection.getConnection(null)) {
+        try(Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "SELECT * FROM %s";
             sql = String.format(sql, db_name);
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -46,7 +51,7 @@ public class HorizontalPartitioningManager {
     public void insertData(Data data, String tableName) {
         DBConnection dbConnection = new DBConnection();
 
-        try (Connection conn = dbConnection.getConnection(null)) {
+        try (Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "INSERT INTO %s (id, first_name, last_name, email, gender, major, address) VALUES (?, ?, ?, ?, ?, ?, ?)";
             sql = String.format(sql, tableName);
             PreparedStatement statement = conn.prepareStatement(sql);
@@ -66,7 +71,7 @@ public class HorizontalPartitioningManager {
 
     public Data getDataById(int id, String table_name) {
         DBConnection dbConnection = new DBConnection();
-        try (Connection conn = dbConnection.getConnection(null)) {
+        try (Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "SELECT * FROM %s WHERE id = ?";
             sql = String.format(sql, table_name);
             PreparedStatement statement = conn.prepareStatement(sql);
@@ -92,7 +97,7 @@ public class HorizontalPartitioningManager {
     
     public void updateData(Data data, String tableName) {
         DBConnection dbConnection = new DBConnection();
-        try (Connection conn = dbConnection.getConnection(null)) {
+        try (Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "UPDATE %s SET first_name = ?, last_name = ?, email = ?, gender = ?, major = ?, address = ? WHERE id = ?";
             sql = String.format(sql, tableName);
             PreparedStatement statement = conn.prepareStatement(sql);
@@ -113,7 +118,7 @@ public class HorizontalPartitioningManager {
     
     public void deleteData(int id, String tableName) {
         DBConnection dbConnection = new DBConnection();
-        try (Connection conn = dbConnection.getConnection(null)) {
+        try (Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "DELETE FROM %s WHERE id = ?";
             sql = String.format(sql, tableName);
             PreparedStatement statement = conn.prepareStatement(sql);

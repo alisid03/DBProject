@@ -16,6 +16,12 @@ public class Sharding {
 
     private static int NUM_SHARDS = 4;
     
+    String password;
+
+    public Sharding(String _password) {
+        password = _password;
+    }
+
     // Hashing function to determine which of the four shards to enter into
     // Hashes on the id
     public int hash(int id) {
@@ -52,7 +58,7 @@ public class Sharding {
         DBConnection dbConnection = new DBConnection();
 
         // pass in the shardurl
-        try (Connection shard = dbConnection.getConnection(shardURL)) {
+        try (Connection shard = dbConnection.getConnection(shardURL, password)) {
             // create the SQL statement
             String sql = "INSERT INTO MOCK_DATA (id, first_name, last_name, email, gender, major, address) VALUES (?, ?, ?, ?, ?, ?, ?)";
             
@@ -82,7 +88,7 @@ public class Sharding {
 
         DBConnection dbConnection = new DBConnection();
 
-        try (Connection conn = dbConnection.getConnection(shardURL)) {
+        try (Connection conn = dbConnection.getConnection(shardURL, password)) {
             String sql = "DELETE FROM MOCK_DATA WHERE id = ?";
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setInt(1, id);
@@ -99,7 +105,7 @@ public class Sharding {
         String shardURL = determineShard(data.getId());
 
         DBConnection dbConnection = new DBConnection();
-        try (Connection conn = dbConnection.getConnection(shardURL)) {
+        try (Connection conn = dbConnection.getConnection(shardURL, password)) {
             String sql = "UPDATE MOCK_DATA SET first_name = ?, last_name = ?, email = ?, gender = ?, major = ?, address = ? WHERE id = ?";
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setString(1, data.getFirst_name());
@@ -122,7 +128,7 @@ public class Sharding {
     public Data getDataById(int id) {
         DBConnection dbConnection = new DBConnection();
         String shardURL = determineShard(id);
-        try (Connection conn = dbConnection.getConnection(shardURL)) {
+        try (Connection conn = dbConnection.getConnection(shardURL, password)) {
             String sql = "SELECT * FROM MOCK_DATA WHERE id = ?";
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setInt(1, id);
@@ -150,7 +156,7 @@ public class Sharding {
         List<Data> dataList = new ArrayList<Data>();
         for(int i = 0; i < NUM_SHARDS; i++) {
             String connectionURL = determineShard(i);
-            try(Connection conn = dbConnection.getConnection(connectionURL)) {
+            try(Connection conn = dbConnection.getConnection(connectionURL, password)) {
                 String sql = "SELECT * FROM MOCK_DATA";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 ResultSet rs = stmt.executeQuery();

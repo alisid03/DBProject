@@ -1,26 +1,37 @@
 import java.util.Random;
-
-import DBManager.Data;
-import DBManager.HorizontalPartitioningManager;
-import DBManager.Sharding;
+import DBManager.*;
+import java.io.*;
 
 public class App {
 
     private static final String OG = "MOCK_DATA";
+    private static final String INDEXED = "MOCK_DATA_INDEXED";
+
+    static String password;
 
     public static void main(String[] args) throws Exception {
+        
+        BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+
+        System.out.print("Enter your MySQL Password: ");
+        String pass = userInput.readLine();
+        setPassword(pass);
+
         // Running the CRUD Tests
         RunTests();
 
     }
 
     // RUNNING TESTS
+    public static void setPassword(String _password) {
+        password = _password;
+    }  
 
     public static void RunTests() {
 
         // Getting the algorithm managers
-        HorizontalPartitioningManager partition = new HorizontalPartitioningManager();
-        Sharding sharding = new Sharding();
+        HorizontalPartitioningManager partition = new HorizontalPartitioningManager(password);
+        Sharding sharding = new Sharding(password);
 
         Random rand = new Random();
         
@@ -79,6 +90,12 @@ public class App {
         end = System.nanoTime();
         System.out.println("Sharding:                " + (end - start) + "   nanoseconds");
 
+        // Original Table with Indexing
+        start = System.nanoTime();
+        partition.retrieveAll(INDEXED);
+        end = System.nanoTime();
+        System.out.println("Indexing:                " + (end - start) + "   nanoseconds");
+
     }
 
     // Get by ID test: Displays the time it takes for each algorithm to retreive a row at a particular index
@@ -114,6 +131,11 @@ public class App {
         end = System.nanoTime();
         System.out.println("Sharding:               " + (end - start) + "   nanoseconds");
 
+        // Original Table with Indexing
+        start = System.nanoTime();
+        Data dataFrom1000Indexed = partition.getDataById(id, INDEXED);
+        end = System.nanoTime();
+        System.out.println("Indexing:               " + (end - start) + "   nanoseconds");
 
     }   
 
@@ -131,7 +153,7 @@ public class App {
         partition.deleteData(id, OG);
         end = System.nanoTime();
         System.out.println("Original Table:         " + (end - start) + "   nanoseconds");
-        
+
         // Partition Size of 50
         start = System.nanoTime();
         partition.delete50Parition(id);
@@ -149,6 +171,12 @@ public class App {
         sharding.deleteData(id);
         end = System.nanoTime();
         System.out.println("Sharding:               " + (end - start) + "   nanoseconds");
+        
+        // Original Table with Indexing
+        start = System.nanoTime();
+        partition.deleteData(id, INDEXED);
+        end = System.nanoTime();
+        System.out.println("Indexing:               " + (end - start) + "   nanoseconds");
 
     }
 
@@ -185,6 +213,11 @@ public class App {
         end = System.nanoTime();
         System.out.println("Sharding:                " + (end - start) + "   nanoseconds");
 
+        // Original Table with Indexing
+        start = System.nanoTime();
+        partition.insertData(data, INDEXED);
+        end = System.nanoTime();
+        System.out.println("Indexing:                " + (end - start) + "   nanoseconds");
     }
 
     // Update test: Displays the time it takes for each algorithm to update a row at a particular index
@@ -219,6 +252,13 @@ public class App {
         sharding.updateData(data);
         end = System.nanoTime();
         System.out.println("Sharding:                " + (end - start) + "   nanoseconds");
+
+        // Original Table with Indexing
+        start = System.nanoTime();
+        partition.updateData(data, INDEXED);
+        end = System.nanoTime();
+        System.out.println("Indexing:                " + (end - start) + "   nanoseconds");
+
 
     }
 
