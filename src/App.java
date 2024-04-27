@@ -6,6 +6,7 @@ public class App {
 
     private static final String OG = "MOCK_DATA";
     private static final String INDEXED = "MOCK_DATA_INDEXED";
+    private static final String CACHING = "MOCK_DATA_CACHING";
 
     static String password;
 
@@ -32,6 +33,7 @@ public class App {
         // Getting the algorithm managers
         HorizontalPartitioningManager partition = new HorizontalPartitioningManager(password);
         Sharding sharding = new Sharding(password);
+        Caching caching = new Caching(password);
 
         Random rand = new Random();
         
@@ -48,17 +50,17 @@ public class App {
         sharding.getDataById(100);
 
         // Running the tests on all CRUD Operations.
-        RunRetrieveTest(partition, sharding);
-        RunGetByIndexTest(idForGet, partition, sharding);
-        RunDeleteTest(id, partition, sharding);
-        RunInsertTest(dataToTestWith, partition, sharding);
-        RunUpdateTest(dataToUpdate, id, partition, sharding);
+        RunRetrieveTest(partition, sharding, caching);
+        RunGetByIndexTest(idForGet, partition, sharding, caching);
+        RunDeleteTest(id, partition, sharding, caching);
+        RunInsertTest(dataToTestWith, partition, sharding, caching);
+        RunUpdateTest(dataToUpdate, id, partition, sharding, caching);
         
         System.out.println("\n");
     }
 
     // Retreive test: Displays the time it takes for each algorithm to retreive every entry in the database.
-    public static void RunRetrieveTest(HorizontalPartitioningManager partition, Sharding sharding) {
+    public static void RunRetrieveTest(HorizontalPartitioningManager partition, Sharding sharding, Caching caching) {
 
         // End - Start = the time a query takes
         long start;
@@ -96,10 +98,16 @@ public class App {
         end = System.nanoTime();
         System.out.println("Indexing:                " + (end - start) + "   nanoseconds");
 
+        // Original Table with Caching
+        start = System.nanoTime();
+        caching.retrieveAll(CACHING);
+        end = System.nanoTime();
+        System.out.println("Caching:                 " + (end - start) + "   nanoseconds");
+
     }
 
     // Get by ID test: Displays the time it takes for each algorithm to retreive a row at a particular index
-    public static void RunGetByIndexTest(int id, HorizontalPartitioningManager partition, Sharding sharding) {
+    public static void RunGetByIndexTest(int id, HorizontalPartitioningManager partition, Sharding sharding, Caching caching) {
         
         // End - Start = the time a query takes
         long start;
@@ -137,10 +145,16 @@ public class App {
         end = System.nanoTime();
         System.out.println("Indexing:               " + (end - start) + "   nanoseconds");
 
+         // Original Table with Caching
+         start = System.nanoTime();
+         Data CachingData = caching.getDataById(id, CACHING);
+         end = System.nanoTime();
+         System.out.println("Caching:               " + (end - start) + "   nanoseconds");
+
     }   
 
     // Deletion test: Displays the time it takes for each algorithm to delete a row at a particular index
-    public static void RunDeleteTest(int id, HorizontalPartitioningManager partition, Sharding sharding) {
+    public static void RunDeleteTest(int id, HorizontalPartitioningManager partition, Sharding sharding, Caching caching) {
         
         // End - Start = the time a query takes
         long start;
@@ -178,10 +192,16 @@ public class App {
         end = System.nanoTime();
         System.out.println("Indexing:               " + (end - start) + "   nanoseconds");
 
+        // Original Table with Caching
+        start = System.nanoTime();
+        caching.deleteData(id, CACHING);
+        end = System.nanoTime();
+        System.out.println("Caching:                " + (end - start) + "   nanoseconds");
+
     }
 
     // Insertion test: Displays the time it takes for each algorithm to insert a row at a particular index
-    public static void RunInsertTest(Data data, HorizontalPartitioningManager partition, Sharding sharding) {
+    public static void RunInsertTest(Data data, HorizontalPartitioningManager partition, Sharding sharding, Caching caching) {
         
         // End - Start = the time a query takes
         long start;
@@ -218,10 +238,16 @@ public class App {
         partition.insertData(data, INDEXED);
         end = System.nanoTime();
         System.out.println("Indexing:                " + (end - start) + "   nanoseconds");
+
+        // Original Table with Caching
+        start = System.nanoTime();
+        caching.insertData(data, CACHING);
+        end = System.nanoTime();
+        System.out.println("Caching:                 " + (end - start) + "   nanoseconds");
     }
 
     // Update test: Displays the time it takes for each algorithm to update a row at a particular index
-    public static void RunUpdateTest(Data data, int id, HorizontalPartitioningManager partition, Sharding sharding) {
+    public static void RunUpdateTest(Data data, int id, HorizontalPartitioningManager partition, Sharding sharding, Caching caching) {
         
         // End - Start = the time a query takes
         long start;
@@ -258,6 +284,12 @@ public class App {
         partition.updateData(data, INDEXED);
         end = System.nanoTime();
         System.out.println("Indexing:                " + (end - start) + "   nanoseconds");
+
+        // Original Table with Caching
+        start = System.nanoTime();
+        caching.updateData(data, CACHING);
+        end = System.nanoTime();
+        System.out.println("Caching:                 " + (end - start) + "   nanoseconds");
 
 
     }
