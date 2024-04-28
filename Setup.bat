@@ -1,5 +1,6 @@
 @echo off
 
+cd src
 javac CreateDatabases.java
 javac App.java
 javac ./DBManager/Data.java
