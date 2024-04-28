@@ -105,6 +105,7 @@ public class Sharding {
         String shardURL = determineShard(data.getId());
 
         DBConnection dbConnection = new DBConnection();
+        // create the query
         try (Connection conn = dbConnection.getConnection(shardURL, password)) {
             String sql = "UPDATE MOCK_DATA SET first_name = ?, last_name = ?, email = ?, gender = ?, major = ?, address = ? WHERE id = ?";
             PreparedStatement statement = conn.prepareStatement(sql);
@@ -124,12 +125,15 @@ public class Sharding {
 
     }
     
-
+    // get by id
     public Data getDataById(int id) {
+        // create the query
         DBConnection dbConnection = new DBConnection();
+        // get the shard
         String shardURL = determineShard(id);
         try (Connection conn = dbConnection.getConnection(shardURL, password)) {
             String sql = "SELECT * FROM MOCK_DATA WHERE id = ?";
+            // pass in appropriate parameters
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setInt(1, id);
             ResultSet result = statement.executeQuery();
@@ -150,14 +154,18 @@ public class Sharding {
         return null;
     }
 
+    // get every entry
     public List<Data> retrieveAll(){
-
+        // connect
         DBConnection dbConnection = new DBConnection();
         List<Data> dataList = new ArrayList<Data>();
+        // loop through every shard, and get everything in each
         for(int i = 0; i < NUM_SHARDS; i++) {
+            // create the query
             String connectionURL = determineShard(i);
             try(Connection conn = dbConnection.getConnection(connectionURL, password)) {
                 String sql = "SELECT * FROM MOCK_DATA";
+                // pass in parameters
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 ResultSet rs = stmt.executeQuery();
                     while(rs.next()) {

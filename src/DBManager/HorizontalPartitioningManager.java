@@ -17,17 +17,18 @@ public class HorizontalPartitioningManager {
         password = _password;
     }
 
+    // get every entry
     public List<Data> retrieveAll(String db_name){
 
         DBConnection dbConnection = new DBConnection();
-
+        // create the query
         try(Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "SELECT * FROM %s";
             sql = String.format(sql, db_name);
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
             List<Data> dataList = new ArrayList<Data>();
-
+            // get every entry
             while(rs.next()) {
                 Data data = new Data();
                 data.setId(rs.getInt("id"));
@@ -48,9 +49,10 @@ public class HorizontalPartitioningManager {
 
     }
 
+    // insert the data
     public void insertData(Data data, String tableName) {
         DBConnection dbConnection = new DBConnection();
-
+        // create the query
         try (Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "INSERT INTO %s (id, first_name, last_name, email, gender, major, address) VALUES (?, ?, ?, ?, ?, ?, ?)";
             sql = String.format(sql, tableName);
@@ -69,14 +71,17 @@ public class HorizontalPartitioningManager {
         }
     }
 
+    // get the data by id
     public Data getDataById(int id, String table_name) {
         DBConnection dbConnection = new DBConnection();
+        // create the query
         try (Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "SELECT * FROM %s WHERE id = ?";
             sql = String.format(sql, table_name);
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setInt(1, id);
             ResultSet result = statement.executeQuery();
+            // get the entry to return
             if (result.next()) {
                 Data data = new Data();
                 data.setId(result.getInt("id"));
@@ -94,12 +99,14 @@ public class HorizontalPartitioningManager {
         return null;
     }
 
-    
+    // update the data
     public void updateData(Data data, String tableName) {
         DBConnection dbConnection = new DBConnection();
+        // create the query
         try (Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "UPDATE %s SET first_name = ?, last_name = ?, email = ?, gender = ?, major = ?, address = ? WHERE id = ?";
             sql = String.format(sql, tableName);
+            // pass in parameters
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setString(1, data.getFirst_name());
             statement.setString(2, data.getLast_name());
@@ -115,8 +122,9 @@ public class HorizontalPartitioningManager {
         }
     }
 
-    
+    // delete the data    
     public void deleteData(int id, String tableName) {
+        // create connection and query
         DBConnection dbConnection = new DBConnection();
         try (Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "DELETE FROM %s WHERE id = ?";
@@ -130,6 +138,7 @@ public class HorizontalPartitioningManager {
         }
     }
     
+    // partition size 50, retrieve all
     public void getAllFrom50Paritioned(){
         for(int i = 1; i <= 10; i++) {
             String db_name = PD+i;
@@ -141,6 +150,8 @@ public class HorizontalPartitioningManager {
         }
     }
 
+
+    // partition size 250, retrieve all
     public void getAllFrom250Partition() {
         for(int i = 1; i<=2; i++) {
             String db_name = PD+"250_"+i;
@@ -153,6 +164,8 @@ public class HorizontalPartitioningManager {
     }
 
 
+    
+    // partition size 50, retrieve entry
     public Data getFrom50Parition(int index) {
         int id = index%50+1; 
         int table = index/50 + 1;
@@ -161,7 +174,7 @@ public class HorizontalPartitioningManager {
         return data;
     }
 
-
+    // partition size 50, retrieve entry
     public Data getFrom250Parition(int index) {
         int id = index%250+1; 
         int table = index/250+1;
@@ -169,18 +182,21 @@ public class HorizontalPartitioningManager {
         return getDataById(id, db_name);
     }
 
+    // partition size 50, update entry
     public void update50Partition(Data data, int index) {
         int table = index/50 + 1;
         String db_name = PD + table;
         updateData(data, db_name);
     }
 
+    // partition size 250, update entry
     public void update250Partition(Data data, int index) {
         int table = index/250 + 1;
         String db_name = PD + "250_" + table;
         updateData(data, db_name);
     }
 
+    // partition size 50, delete entry
     public void delete50Parition(int index) {
         int id = index%50+1; 
         int table = index/50 + 1;
@@ -188,6 +204,7 @@ public class HorizontalPartitioningManager {
         deleteData(id, db_name);
     }
 
+    // partition size 250, retrieve entry
     public void delete250Parition(int index) {
         int id = index%250+1; 
         int table = index/250 + 1;
@@ -195,12 +212,14 @@ public class HorizontalPartitioningManager {
         deleteData(id, db_name);
     }
 
+    // partition size 50, create entry
     public void create50Partition(Data data, int index) {
         int table = index/50 + 1;
         String db_name = PD+table;
         insertData(data, db_name);
     }
 
+    // partition size 250, create entry
     public void create250Partition(Data data, int index) {
         int table = index/250 + 1;
         String db_name = PD+"250_"+table;

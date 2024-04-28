@@ -19,6 +19,7 @@ public class CreateDatabases {
 
     public static void main(String[] args) {
 
+        // Adding the password prompt
         String pass = "";
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         try {
@@ -28,6 +29,7 @@ public class CreateDatabases {
             e.printStackTrace();
         }
         
+        // pass in the password
         CreateDatabases cd = new CreateDatabases(pass);
 
         

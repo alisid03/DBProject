@@ -14,6 +14,7 @@ public class App {
         
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
 
+        // prompt for the user's mysql password
         System.out.print("Enter your MySQL Password: ");
         String pass = userInput.readLine();
         setPassword(pass);
@@ -23,11 +24,12 @@ public class App {
 
     }
 
-    // RUNNING TESTS
+    // sets the password variable
     public static void setPassword(String _password) {
         password = _password;
     }  
 
+    // RUNNING TESTS
     public static void RunTests() {
 
         // Getting the algorithm managers
@@ -56,6 +58,7 @@ public class App {
         RunInsertTest(dataToTestWith, partition, sharding, caching);
         RunUpdateTest(dataToUpdate, id, partition, sharding, caching);
         
+        // removes the data that we added so that we can run another test later if we wanted to 
         RemoveTheTestData(id, partition, sharding, caching);
 
         System.out.println("\n");

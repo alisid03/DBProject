@@ -14,6 +14,7 @@ public class Data {
     public Data() {
     }
 
+    // creating a data structure to store results of our entries in the databases
     public Data(int id, String first_name, String last_name, String email, String gender, String major, String address) {
         this.id = id;
         this.first_name = first_name;

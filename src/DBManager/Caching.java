@@ -16,22 +16,24 @@ public class Caching {
         password = _password;
     }
 
-
+    // the cache
     public Map<Integer, Data> cache = new HashMap<>();
     public List<Data> retrieveAll(String db_name){
 
+        // if the cache is empty, then we search the database, otherwise pull from cache
         if (!cache.isEmpty()) {
             return new ArrayList<>(cache.values()); // Return data from cache if it's populated
         }
         DBConnection dbConnection = new DBConnection();
 
+        // create the sql query
         try(Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "SELECT * FROM %s";
             sql = String.format(sql, db_name);
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
             List<Data> dataList = new ArrayList<Data>();
-
+            // pull every entry, one at a time
             while(rs.next()) {
                 Data data = new Data();
                 data.setId(rs.getInt("id"));
@@ -42,6 +44,7 @@ public class Caching {
                 data.setMajor(rs.getString("major"));
                 data.setAddress(rs.getString("address"));
 
+                // add what you get to the overall list of a data entries
                 dataList.add(data);
                 cache.put(data.getId(), data);
             }
@@ -53,12 +56,15 @@ public class Caching {
 
     }
 
+    // insert data
     public void insertData(Data data, String tableName) {
         DBConnection dbConnection = new DBConnection();
 
+        // create the query
         try (Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "INSERT INTO %s (id, first_name, last_name, email, gender, major, address) VALUES (?, ?, ?, ?, ?, ?, ?)";
             sql = String.format(sql, tableName);
+            // set the parameters of the query
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setInt(1, data.getId());
             statement.setString(2, data.getFirst_name());
@@ -74,17 +80,22 @@ public class Caching {
         }
     }
 
+    // get the data by the id
     public Data getDataById(int id, String table_name) {
-        
+        // if its in the cache, get it from the cache
         if (cache.containsKey(id)) {
             return cache.get(id);
         }
+        // otherwise run the sql query
         DBConnection dbConnection = new DBConnection();
         try (Connection conn = dbConnection.getConnection(null, password)) {
+            // create the query
             String sql = "SELECT * FROM %s WHERE id = ?";
             sql = String.format(sql, table_name);
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setInt(1, id);
+            
+            // put the result in the cache
             ResultSet result = statement.executeQuery();
             if (result.next()) {
                 Data data = new Data();
@@ -106,12 +117,14 @@ public class Caching {
         return null;
     }
 
-    
+    // update the data
     public void updateData(Data data, String tableName) {
+        // create the query
         DBConnection dbConnection = new DBConnection();
         try (Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "UPDATE %s SET first_name = ?, last_name = ?, email = ?, gender = ?, major = ?, address = ? WHERE id = ?";
             sql = String.format(sql, tableName);
+            // create the query, pass in the necessary parameters
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setString(1, data.getFirst_name());
             statement.setString(2, data.getLast_name());
@@ -127,9 +140,10 @@ public class Caching {
         }
     }
 
-    
+    // delete the data
     public void deleteData(int id, String tableName) {
         DBConnection dbConnection = new DBConnection();
+        // create the query
         try (Connection conn = dbConnection.getConnection(null, password)) {
             String sql = "DELETE FROM %s WHERE id = ?";
             sql = String.format(sql, tableName);
