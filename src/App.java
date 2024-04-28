@@ -56,7 +56,10 @@ public class App {
         RunInsertTest(dataToTestWith, partition, sharding, caching);
         RunUpdateTest(dataToUpdate, id, partition, sharding, caching);
         
+        RemoveTheTestData(id, partition, sharding, caching);
+
         System.out.println("\n");
+
     }
 
     // Retreive test: Displays the time it takes for each algorithm to retreive every entry in the database.
@@ -149,7 +152,7 @@ public class App {
          start = System.nanoTime();
          Data CachingData = caching.getDataById(id, CACHING);
          end = System.nanoTime();
-         System.out.println("Caching:               " + (end - start) + "   nanoseconds");
+         System.out.println("Caching:                " + (end - start) + "   nanoseconds");
 
     }   
 
@@ -290,9 +293,21 @@ public class App {
         caching.updateData(data, CACHING);
         end = System.nanoTime();
         System.out.println("Caching:                 " + (end - start) + "   nanoseconds");
+    }
 
 
+    public static void RemoveTheTestData(int id, HorizontalPartitioningManager partition, Sharding sharding, Caching caching) {
+        
+        // remove the data that was inserted during the insert test (fixed problem that arised when running App.java more than once.)
+        partition.deleteData(id, OG);
+        partition.delete50Parition(id);
+        partition.delete250Parition(id);
+        sharding.deleteData(id);
+        partition.deleteData(id, INDEXED);
+        caching.deleteData(id, CACHING);
+                
     }
 
 
 }
+

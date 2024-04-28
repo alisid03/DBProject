@@ -36,6 +36,7 @@ public class CreateDatabases {
         cd.CreatePartitioned();
         cd.CreateIndexed();
         cd.CreateShards();
+        cd.CreateCached();
     }
 
     // Get the query from the query folder
@@ -69,7 +70,8 @@ public class CreateDatabases {
             statement.executeUpdate();
             System.out.println("File " + queryFile + " Executed.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
+            System.out.println(queryFile + " Database already created.");
         }
     }
 
@@ -107,6 +109,10 @@ public class CreateDatabases {
         runQuery("shard3");
         //shard4
         runQuery("shard4");
+    }
+
+    public void CreateCached() {
+        runQuery("Caching");
     }
 
     
